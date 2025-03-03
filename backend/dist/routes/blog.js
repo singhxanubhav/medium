@@ -75,6 +75,17 @@ blogRouter.put("/", authenticate, async (req, res) => {
         return res.status(500).json({ error: "Error updating post" });
     }
 });
+// Get all blog post
+// @ts-ignore
+blogRouter.get("/bulk", async (req, res) => {
+    try {
+        const blogs = await prisma.post.findMany();
+        return res.json({ blogs });
+    }
+    catch (error) {
+        return res.status(500).json({ error: "Error fetching blogs" });
+    }
+});
 // Get a blog post by ID
 // @ts-ignore
 blogRouter.get("/:id", authenticate, async (req, res) => {

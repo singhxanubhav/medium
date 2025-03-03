@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@anubhavxsingh/common": "^1.0.0",
+    "@anubhavxsingh/common-p": "^1.0.0",
     "@prisma/client": "^6.4.1",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
