@@ -93,7 +93,7 @@ blogRouter.put("/", authenticate, async (req: AuthRequest, res: Response) => {
 
 // Get all blog post
 // @ts-ignore
-blogRouter.get("/bulk", async (req: Request, res: Response) => {
+blogRouter.get("/bulk", authenticate,  async (req: Request, res: Response) => {
   try {
       const blogs = await prisma.post.findMany();
       return res.json({ blogs });
