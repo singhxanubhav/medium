@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
-import { signinInput, signupInput } from "@anubhavxsingh/common-p"; // Importing both
+import { signinInput, signupInput } from "@anubhavxsingh/common-blog";
 
 dotenv.config();
 
@@ -29,13 +29,13 @@ useRouter.post("/signup", async (req: any, res: any) => {
   }
   
 
-    const { email, password } = parseResult.data;
+    const { username, password } = parseResult.data;
 
     // Hash the password before storing
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { email, password: hashedPassword },
+      data: { username, password: hashedPassword },
     });
 
     // Generate JWT Token
@@ -59,10 +59,10 @@ useRouter.post("/signin", async (req: any, res: any) => {
   }
   
 
-    const { email, password } = parseResult.data;
+    const { username, password } = parseResult.data;
 
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { username },
     });
 
     if (!user) {

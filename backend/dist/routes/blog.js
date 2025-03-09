@@ -2,6 +2,7 @@ import express from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { createBlogInput, updateBlogInput } from "@anubhavxsingh/common-blog";
 dotenv.config();
 const blogRouter = express.Router();
 const prisma = new PrismaClient();
@@ -11,96 +12,105 @@ const authenticate = (req, res, next) => {
     try {
         const authHeader = req.header("Authorization");
         if (!authHeader) {
-            return res.status(401).json({ error: "Unauthorized" });
+            return res.status(403).json({ message: "You are not logged in" });
         }
         const token = authHeader.split(" ")[1];
-        const payload = jwt.verify(token, JWT_SECRET);
-        if (!payload || typeof payload !== "object" || !payload.id) {
-            return res.status(401).json({ error: "Invalid token" });
+        const user = jwt.verify(token, JWT_SECRET);
+        if (!user || !user.id) {
+            return res.status(403).json({ message: "You are not logged in" });
         }
-        req.userId = payload.id;
+        req.userId = user.id;
         next();
     }
     catch (error) {
-        return res.status(401).json({ error: "Unauthorized" });
+        return res.status(403).json({ message: "You are not logged in" });
     }
 };
 // Create a new blog post
 // @ts-ignore
 blogRouter.post("/", authenticate, async (req, res) => {
     try {
-        const { title, content } = req.body;
-        if (!title || !content) {
-            return res.status(400).json({ error: "Title and content are required" });
+        const { success } = createBlogInput.safeParse(req.body);
+        if (!success) {
+            return res.status(411).json({ message: "Inputs not correct" });
         }
-        const post = await prisma.post.create({
+        const post = await prisma.blog.create({
             data: {
-                title,
-                content,
-                authorId: req.userId,
+                title: req.body.title,
+                content: req.body.content,
+                authorId: Number(req.userId),
             },
         });
         return res.json({ id: post.id });
     }
     catch (error) {
-        return res.status(500).json({ error: "Error creating post" });
+        return res.status(500).json({ message: "Error creating post" });
     }
 });
 // Update a blog post
 // @ts-ignore
 blogRouter.put("/", authenticate, async (req, res) => {
     try {
-        const { id, title, content } = req.body;
-        if (!id || !title || !content) {
-            return res
-                .status(400)
-                .json({ error: "ID, title, and content are required" });
+        const { success } = updateBlogInput.safeParse(req.body);
+        if (!success) {
+            return res.status(411).json({ message: "Inputs not correct" });
         }
-        const updatedPost = await prisma.post.update({
-            where: {
-                id,
-                authorId: req.userId,
-            },
+        const updatedPost = await prisma.blog.update({
+            where: { id: req.body.id },
             data: {
-                title,
-                content,
+                title: req.body.title,
+                content: req.body.content,
             },
         });
-        return res.json({
-            message: "Post updated successfully",
-            post: updatedPost,
-        });
+        return res.json({ id: updatedPost.id });
     }
     catch (error) {
-        return res.status(500).json({ error: "Error updating post" });
+        return res.status(500).json({ message: "Error updating post" });
     }
 });
-// Get all blog post
+// Get all blog posts
 // @ts-ignore
-blogRouter.get("/bulk", authenticate, async (req, res) => {
+blogRouter.get("/bulk", async (req, res) => {
     try {
-        const blogs = await prisma.post.findMany();
+        const blogs = await prisma.blog.findMany({
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                author: {
+                    select: { name: true },
+                },
+            },
+        });
         return res.json({ blogs });
     }
     catch (error) {
-        return res.status(500).json({ error: "Error fetching blogs" });
+        return res.status(500).json({ message: "Error fetching blogs" });
     }
 });
 // Get a blog post by ID
 // @ts-ignore
-blogRouter.get("/:id", authenticate, async (req, res) => {
+blogRouter.get("/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const post = await prisma.post.findUnique({
-            where: { id },
+        const blog = await prisma.blog.findFirst({
+            where: { id: Number(id) },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                author: {
+                    select: { name: true },
+                },
+            },
         });
-        if (!post) {
-            return res.status(404).json({ error: "Post not found" });
+        if (!blog) {
+            return res.status(404).json({ message: "Post not found" });
         }
-        return res.json(post);
+        return res.json({ blog });
     }
     catch (error) {
-        return res.status(500).json({ error: "Error retrieving post" });
+        return res.status(500).json({ message: "Error retrieving post" });
     }
 });
 export default blogRouter;
