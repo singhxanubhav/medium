@@ -17,7 +17,10 @@ useRouter.post("/signup", async (req, res) => {
     try {
         const parseResult = signupInput.safeParse(req.body);
         if (!parseResult.success) {
-            return res.status(400).json({ error: parseResult.error.errors });
+            res.status(411).json({
+                message: "Inputs not correct"
+            });
+            return;
         }
         const { email, password } = parseResult.data;
         // Hash the password before storing
@@ -38,7 +41,10 @@ useRouter.post("/signin", async (req, res) => {
     try {
         const parseResult = signinInput.safeParse(req.body);
         if (!parseResult.success) {
-            return res.status(400).json({ error: parseResult.error.errors });
+            res.status(411).json({
+                message: "Inputs not correct"
+            });
+            return;
         }
         const { email, password } = parseResult.data;
         const user = await prisma.user.findUnique({
