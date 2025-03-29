@@ -9,6 +9,7 @@ interface BlogCardProps {
 }
 
 export const BlogCard = ({ id, authorName, title, content, publishedDate }: BlogCardProps) => {
+  
   return (
     <Link to={`/blog/${id}`} className="block">
       <div className="p-6 bg-white rounded-lg shadow-md border border-slate-200 hover:shadow-lg transition duration-200 cursor-pointer w-screen max-w-screen-md">
@@ -40,14 +41,14 @@ export function Circle() {
   return <div className="h-1 w-1 rounded-full bg-slate-500"></div>;
 }
 
-export function Avatar({ name, size = "small" }: { name: string; size?: "small" | "big" }) {
+export function Avatar({ name = "Anonymous", size = "small" }: { name?: string; size?: "small" | "big" }) {
   return (
     <div
       className={`relative inline-flex items-center justify-center overflow-hidden bg-gray-700 text-white rounded-full ${
         size === "small" ? "w-8 h-8 text-sm" : "w-12 h-12 text-lg"
       }`}
     >
-      {name[0].toUpperCase()}
+      {name ? name[0].toUpperCase() : "A"}
     </div>
   );
 }
