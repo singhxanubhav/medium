@@ -22,15 +22,18 @@ useRouter.post("/signup", async (req, res) => {
             });
             return;
         }
-        const { username, password } = parseResult.data;
+        const { name, username, password } = parseResult.data;
         // Hash the password before storing
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await prisma.user.create({
-            data: { username, password: hashedPassword },
+            // @ts-ignore
+            data: { name, username, password: hashedPassword },
         });
         // Generate JWT Token
         const token = jwt.sign({ id: user.id }, JWT_SECRET);
-        res.json({ jwt: token });
+        res.json({ jwt: token,
+            email: user.username
+        });
     }
     catch (error) {
         console.error("Signup Error:", error);
@@ -58,7 +61,9 @@ useRouter.post("/signin", async (req, res) => {
             return res.status(403).json({ error: "Invalid credentials" });
         }
         const token = jwt.sign({ id: user.id }, JWT_SECRET);
-        res.json({ jwt: token });
+        res.json({ jwt: token,
+            email: user.username
+        });
     }
     catch (error) {
         console.error("Signin Error:", error);

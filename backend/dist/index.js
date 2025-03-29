@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: "*", // Specific frontend origin allow kar
+    origin: ["https://medium-blog-ten-tau.vercel.app", "http://localhost:5173"],
     methods: "GET, POST, PUT, DELETE",
     allowedHeaders: "Content-Type, Authorization"
 }));

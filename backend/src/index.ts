@@ -10,7 +10,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: "https://medium-blog-ten-tau.vercel.app",
+  origin: ["https://medium-blog-ten-tau.vercel.app", "http://localhost:5173"],
   methods: "GET, POST, PUT, DELETE",
   allowedHeaders: "Content-Type, Authorization"
 }));

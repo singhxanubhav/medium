@@ -23,25 +23,25 @@ useRouter.post("/signup", async (req: any, res: any) => {
     const parseResult = signupInput.safeParse(req.body);
     if (!parseResult.success) {
       res.status(411).json({
-          message: "Inputs not correct"
+        message: "Inputs not correct",
       });
       return;
-  }
-  
+    }
 
-    const { username, password } = parseResult.data;
+    const { name, username, password } = parseResult.data;
 
     // Hash the password before storing
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { username, password: hashedPassword },
+      // @ts-ignore
+      data: { name, username, password: hashedPassword },
     });
 
     // Generate JWT Token
     const token = jwt.sign({ id: user.id }, JWT_SECRET);
 
-    res.json({ jwt: token });
+    res.json({ jwt: token, email: user.username });
   } catch (error) {
     console.error("Signup Error:", error);
     res.status(500).json({ error: "Error signing up" });
@@ -53,11 +53,10 @@ useRouter.post("/signin", async (req: any, res: any) => {
     const parseResult = signinInput.safeParse(req.body);
     if (!parseResult.success) {
       res.status(411).json({
-          message: "Inputs not correct"
+        message: "Inputs not correct",
       });
       return;
-  }
-  
+    }
 
     const { username, password } = parseResult.data;
 
@@ -77,7 +76,7 @@ useRouter.post("/signin", async (req: any, res: any) => {
 
     const token = jwt.sign({ id: user.id }, JWT_SECRET);
 
-    res.json({ jwt: token });
+    res.json({ jwt: token, email: user.username });
   } catch (error) {
     console.error("Signin Error:", error);
     res.status(500).json({ error: "Error signing in" });
