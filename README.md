@@ -34,27 +34,27 @@ git clone https://github.com/singhxanubhav/medium.git
 ```
 cd backend
 ```
-2. Rename the of `.env.sample` file to `.env` and fill the necessary fields
-3. Install Dependencies 
+3. Rename the of `.env.sample` file to `.env` and fill the necessary fields
+4. Install Dependencies 
 ```
 npm install
 ```
-4. Run the Server
+5. Run the Server
 ```
 npm run start
 ```
-5. Go to Root Directory
+6. Go to Root Directory
 ```
 cd..
 ```
 ```
 cd frontend
 ```
-6. Install Dependencies 
+7. Install Dependencies 
 ```
 npm install
 ```
-7. Run the frontend
+8. Run the frontend
 ```
 npm run dev
 ```
